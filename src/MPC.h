@@ -6,15 +6,25 @@
 
 using namespace std;
 
-class MPC {
- public:
+// For converting back and forth between radians and degrees.
+constexpr double pi();
+double deg2rad(double x);
+double rad2deg(double x);
+
+class MPC
+{
+public:
   MPC();
-
   virtual ~MPC();
-
-  // Solve the model given an initial state and polynomial coefficients.
-  // Return the first actuatotions.
   vector<double> Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs);
+
+  vector<double> GetMpcX();
+  vector<double> GetMpcY();
+
+private:
+  vector<double> mpc_x;
+  vector<double> mpc_y;
+
 };
 
 #endif /* MPC_H */

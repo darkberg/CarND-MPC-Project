@@ -1,7 +1,74 @@
 # CarND-Controls-MPC
-Self-Driving Car Engineer Nanodegree Program
+Udacity Self-Driving Car Engineer Nanodegree Program
 
----
+Term 2 Last project
+
+## Results
+
+Here are videos of my results in this project.
+
+### 60 MPH with 100ms delay
+
+[![60 MPH with 100ms delay](http://img.youtube.com/vi/ie7HG9XIwgU/0.jpg)](http://www.youtube.com/watch?v=ie7HG9XIwgU)
+
+### 100 MPH with 10ms delay
+
+[![100 MPH with 10ms delay](http://img.youtube.com/vi/tFGBnKBnpfA/0.jpg)](http://www.youtube.com/watch?v=tFGBnKBnpfA)
+
+## Model
+
+I have used kinematic model presented in the course which consists of vehicle state and actuators.
+Vehicle state vector consist of:
+- x (position)
+- y (position)
+- psi (orientation)
+- v (velocity)
+- cte (Cross Track Error)
+- epsi (orientation error)
+
+I am using following actuators:
+- delta - steering angle change limited to -0.25, 0.25 rad (+/- 14.3 deg)
+- a - acceleration limited to -1, 1
+
+Kinematic equations
+```
+x1    = x0 + v0 * cos(psi0) * dt;
+y1    = y0 + v0 * sin(psi0) * dt;
+psi1  = psi0 + v0 * delta0 / Lf * dt;
+v1    = v0 + a0 * dt;
+cte1  = f0 - y0 + v0 * sin(epsi0) * dt;
+epsi1 = psi0 - psides0 + v0 * delta0 / Lf * dt;
+```
+
+### Cost function
+
+Cost function can be changed from command line by specifing 7 arguments:
+- factor_cte - cost factor for CTE
+- factor_epsi - cost factor for psi error
+- factor_v - cost factor for velocity
+- factor_steering - cost factor for steering value
+- factor_throttle - cost factor for throttle value
+- factor_seq_steering - cost factor for steering sequence
+- factor_seq_throttle - cost factor for throttle sequence
+
+
+Runing `./mpc` is same as:
+```
+./mpc 2 5 0.1 1000 0.1 30000 1
+```
+
+## Timestep Length and Elapsed Duration (N & dt)
+
+I have tried multiple combinations of N & dt. I achieved best results for next ten steps where dt is equal to 100ms latency. After change of these values cost computation should be tunned. I wanted to keep N low to have best performance.
+
+## Polynomial Fitting and MPC Preprocessing
+
+3rd order polynomial is used to fit waypoints provided by simulator. Fitted path is the yellow one in simulator. The green path is trajectory predicted for this model.
+
+## Latency
+
+There is almost no latency when you run simulation, so we must simulate latency. I added 100ms latency as required, but I also checked higher speed with lower latency 10ms. In real world we need to minimize latency using hardware instead of software solutions for low level control.
+To fight latency I am using sum of first two following actuations as my current steering angle and throttle. This approach solves the problem of latency.
 
 ## Dependencies
 
@@ -19,7 +86,7 @@ Self-Driving Car Engineer Nanodegree Program
   * Run either `install-mac.sh` or `install-ubuntu.sh`.
   * If you install from source, checkout to commit `e94b6e1`, i.e.
     ```
-    git clone https://github.com/uWebSockets/uWebSockets 
+    git clone https://github.com/uWebSockets/uWebSockets
     cd uWebSockets
     git checkout e94b6e1
     ```
@@ -31,7 +98,7 @@ Self-Driving Car Engineer Nanodegree Program
   * Mac: `brew install ipopt`
   * Linux
     * You will need a version of Ipopt 3.12.1 or higher. The version available through `apt-get` is 3.11.x. If you can get that version to work great but if not there's a script `install_ipopt.sh` that will install Ipopt. You just need to download the source from the Ipopt [releases page](https://www.coin-or.org/download/source/Ipopt/) or the [Github releases](https://github.com/coin-or/Ipopt/releases) page.
-    * Then call `install_ipopt.sh` with the source directory as the first argument, ex: `bash install_ipopt.sh Ipopt-3.12.1`. 
+    * Then call `install_ipopt.sh` with the source directory as the first argument, ex: `bash install_ipopt.sh Ipopt-3.12.1`.
   * Windows: TODO. If you can use the Linux subsystem and follow the Linux instructions.
 * [CppAD](https://www.coin-or.org/CppAD/)
   * Mac: `brew install cppad`
